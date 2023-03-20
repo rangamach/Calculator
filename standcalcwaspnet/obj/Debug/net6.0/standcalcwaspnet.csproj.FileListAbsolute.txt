@@ -31,3 +31,4 @@ C:\Users\Ranganath\standcalcwaspnet\standcalcwaspnet\obj\Debug\net6.0\standcalcw
 C:\Users\Ranganath\standcalcwaspnet\standcalcwaspnet\obj\Debug\net6.0\ref\standcalcwaspnet.dll
 C:\Users\Ranganath\standcalcwaspnet\standcalcwaspnet\bin\Debug\net6.0\System.Security.Permissions.dll
 C:\Users\Ranganath\standcalcwaspnet\standcalcwaspnet\obj\Debug\net6.0\standcalcwaspnet.csproj.CopyComplete
+C:\Users\Ranganath\standcalcwaspnet\standcalcwaspnet\bin\Debug\net6.0\Newtonsoft.Json.dll

@@ -16,3 +16,104 @@ html {
 body {
   margin-bottom: 60px;
 }
+input {
+    background-color: darkred;
+    color: indianred;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.calcbrowser {
+    background-color: darkred;
+    width: 225px;
+    height: 325px;
+    border-radius: 5px;
+}
+
+.textbox_inp {
+    background-color: darkolivegreen;
+    color: black;
+    box-shadow: 5px 10px black;
+}
+
+#textbox_res {
+    background-color: darkolivegreen;
+    color: black;
+    box-shadow: 5px 10px black;
+    border-radius: 10px;
+    text-align: center;
+    width: 80%;
+}
+
+.meta {
+    color: palevioletred;
+}
+
+button {
+    color: deeppink;
+    background-color: hotpink;
+    box-shadow: 2.5px 5px black;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+button:hover {
+    background-color: deeppink;
+    color: hotpink;
+}
+
+input:hover {
+    background-color: indianred;
+    color: darkred;
+}
+#ttle{
+    color:darkorange;
+    background-color: orangered;
+    width:200px;
+    border-radius:20px;
+    text-align:center;
+}
+.login_inp {
+    background-color: darkolivegreen;
+    color: black;
+    box-shadow: 5px 10px black;
+}
+.evaluation {
+    color: deeppink;
+    background-color: hotpink;
+    box-shadow: 2.5px 5px black;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+evaluation:hover {
+    background-color: indianred;
+    color: darkred;
+}
+.login {
+    color: deeppink;
+    background-color: hotpink;
+    box-shadow: 2.5px 5px black;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+.login:hover {
+    background-color: indianred;
+    color: darkred;
+}
+p{
+    background-color: darkred;
+    color:red;
+}
+.input{
+    align-items:center;
+    padding-left:10px;
+}
+.x{
+    padding-top: 10px;
+}
+.btns{
+    padding-top:5px;
+}
+.login-btn{
+    padding-top: 10px;
+}

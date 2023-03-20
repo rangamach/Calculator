@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using standcalcwaspnet.Models;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace standcalcwaspnet.Controllers
 {
@@ -7,6 +9,14 @@ namespace standcalcwaspnet.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+        public JsonResult GreetName(string Lname,string age)
+        {
+            PartialModel p_model = new PartialModel()
+            {
+                Name = "Ranga " + Lname +". Your Age is: " + age
+            };
+                return Json(p_model);
         }
     }
 }

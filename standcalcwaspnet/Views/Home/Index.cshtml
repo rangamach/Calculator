@@ -3,107 +3,60 @@
     ViewData["Title"] = "Home Page";
 }
 <script src="~/lib/jquery/jquery-3.6.3.js"></script>
-<style>
-    input{
-        background-color:darkred;
-        color: indianred;
-        border-radius: 10px;
-        transition:all 0.3s;
-
-    }
-    .calcbrowser{
-        background-color: darkred;
-        width:200px;
-        height: 300px;
-        border-radius:5px;
-    }
-
-    .textbox_inp {
-        background-color:darkolivegreen;
-        color:black;
-        box-shadow: 5px 10px black;
-    }
-
-    .textbox_res {
-        background-color: darkolivegreen;
-        color: black;
-        box-shadow: 5px 10px black;
-    }
-    p{
-        color:palevioletred;
-    }
-    button{
-        color:deeppink;
-        background-color:hotpink;
-        box-shadow: 2.5px 5px black;
-        border-radius:10px;
-        transition:all 0.3s;
-    }
-    button:hover{
-            background-color: deeppink;
-            color: hotpink;
-    }
-    input:hover {
-        background-color: indianred;
-        color: darkred;
-        }
-</style>
-<h1 is="ttle">Calculator</h1>
+<link href="~/css/site.css" rel="stylesheet"/>
+<h1 id="ttle">Calculator</h1>
 <br>
 <div class="calcbrowser">
-    <p>@Html.DisplayFor(u=>u.user) --> @Html.DisplayFor(s=>s.userReqCount)</p>
-    <br />
-    <table id="buttons">
-        <tr>
-            <td><button>1</button></td>
-            <td><button>2</button></td>
-            <td><button>3</button></td>
-            <td><button>+</button></td>
-            <td><button>-</button></td>
-            <td><button>.</button></td>
-        </tr>
-        <tr>
-            <td><button>4</button></td>
-            <td><button>5</button></td>
-            <td><button>6</button></td>
-            <td><button>*</button></td>
-            <td><button>/</button></td>
-        </tr>
-        <tr>
-            <td><button>7</button></td>
-            <td><button>8</button></td>
-            <td><button>9</button></td>
-            <td><button>(</button></td>
-            <td><button>)</button></td>
-        </tr>
-        <tr>
-            <td><button>X</button></td>
-            <td><button>0</button></td>
-            <td><button id="clear">C</button></td>
-            <td><button>^</button></td>
+    <table>
+     <tr>
+            <td><div class="meta" id="session">@Html.DisplayFor(u=>u.user)</div></td>
+            <td><div class="meta" id="cnt">@Html.DisplayFor(s=>s.userReqCount)</div></td>
+     </tr>
     </table>
-    @using (Html.BeginForm())
-    {
+    <table id="buttons" align="center">
+        <tr>
+            <td><div class="btns"><button>1</button></div></td>
+            <td><div class="btns"><button>2</button></div></td>
+            <td><div class="btns"><button>3</button></div></td>
+            <td><div class="btns"><button>+</button></div></td>
+            <td><div class="btns"><button>-</button></div></td>
+            <td><div class="btns"><button>.</button></div></td>
+        </tr>
+        <tr>
+            <td><div class="btns"><button>4</button></div></td>
+            <td><div class="btns"><button>5</button></div></td>
+            <td><div class="btns"><button>6</button></div></td>
+            <td><div class="btns"><button>*</button></div></td>
+            <td><div class="btns"><button>/</button></div></td>
+        </tr>
+        <tr>
+            <td><div class="btns"><button>7</button></div></td>
+            <td><div class="btns"><button>8</button></div></td>
+            <td><div class="btns"><button>9</button></div></td>
+            <td><div class="btns"><button>(</button></div></td>
+            <td><div class="btns"><button>)</button></div></td>
+        </tr>
+        <tr>
+            <td><div class="btns"><button>X</button></div></td>
+            <td><div class="btns"><button>0</button></div></td>
+            <td><div class="btns"><button>C</button></div></td>
+            <td><div class="btns"><button>^</button></div></td>
+            <td><div class="btns"><input type="button" class="evaluation" value="=" /></div></td>
+    </table>
         <div class="input">
             <table>
+            <tr><td><div class="x">-X-X-X-X-X-X-X-X-X-X-X-X-</div></td></tr>
                 <tr>
-                    <td>
-                        @Html.TextBoxFor(s=>s.infstr,new { @readonly = true,@class = "textbox_inp" })
+                    <td align="center">
+                        <input type="text" class="textbox_inp" readonly ="readonly"/>
                     </td>
                 </tr>
+            <tr><td><div class="x">-X-X-X-X-X-X-X-X-X-X-X-X-</div></td></tr>
                 <tr>
-                    <td colspan="2" align="center">
-                        <input type="submit" value="=" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        @Html.TextBoxFor(t=>t.result,new { @readonly = true,@class = "textbox_res" })
-                    </td>
+                    <td align="center"><div id="textbox_res">@Html.DisplayFor(s=>s.result)</div></td>
                 </tr>
             </table>
         </div>
-    }
 </div>
     <script>
         x = $("button");
@@ -169,4 +122,13 @@
                 y.value = "";
             }
     }
+    $(document).ready(function () {
+        $(".evaluation").click(function () {
+            $.get("/Home/Evaluation?infix=" + $(".textbox_inp").val(), function (data) {
+                $("#session").html(data.user);
+                $("#cnt").html(data.userReqCount);
+                $("#textbox_res").html(data.result);
+            });
+        });
+    });
 </script>

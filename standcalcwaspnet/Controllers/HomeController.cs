@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using standcalcwaspnet.Models;
+using System;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 
 namespace standcalcwaspnet.Controllers
 {
@@ -12,17 +14,17 @@ namespace standcalcwaspnet.Controllers
         {
             _logger = logger;
         }
+        [HttpGet]
         public ActionResult Index(string Name)
         {
             CalcModel model = new CalcModel();
-            HttpContext.Session.SetString("username", "Ranga");
-            //HttpContext.Session.SetString("username", Name);
+            HttpContext.Session.SetString("username", Name);
             HttpContext.Session.SetString("userReqCnt", "0");
-            //model.user = HttpContext.Session.GetString("username") + "-->" + HttpContext.Session.GetString("userReqCnt");
             model.user = HttpContext.Session.GetString("username");
             model.userReqCount = HttpContext.Session.GetString("userReqCnt");
             return View(model);
         }
+        [HttpGet]
         public ActionResult Login()
         {
             return View();
@@ -30,44 +32,46 @@ namespace standcalcwaspnet.Controllers
         [HttpPost]
         public ActionResult Login(LoginModel input)
         {
-            List<string> Users = new List<string>();
-            Users.Add("Ranga");
-            Users.Add("Hemanth");
-            if(Users.Contains(input.user))
+            List<LoginModel> Login_Info = new List<LoginModel>();
+            Login_Info.Add(new LoginModel
+            {
+                user = "Ranga",
+                pass = "Mach"
+            });
+            Login_Info.Add(new LoginModel
+            {
+                user = "Hemanth",
+                pass = "Venk"
+            });
+            if (Validate_Login(input))
             {
                 return RedirectToAction("Index", new { name = input.user });
-                //return Redirect("/Home");
             }
             else
             {
                 ViewBag.Sorry = "Invalid User Name";
                 return View();
             }
+            bool Validate_Login(LoginModel input)
+            {
+                foreach (var input_info in Login_Info)
+                {
+                    if (input.user == input_info.user && input.pass == input_info.pass)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
         //constant string of operators...
-        string operatorstr = "+-*/^()";
+        string operatorstr = " -*/^()";
         //List to keep track of operators...
         List<string> stacklst = new List<string>();
         int top_op = -1;
         //fh --> first half and sh --> second half...
         string sh;
         string fh;
-        [HttpPost]
-        public ActionResult Index(CalcModel input)
-        {
-            //split operators and operands string...
-            string infixstr = addcommas(input.infstr);
-            //create an array of operators and operands...
-            string[] infixarr = removecommas(infixstr);
-            //converts infix array to postfix array for easy evaluation...
-            List<string> postfixlst = inftopof(infixarr);
-            //postfix list evaluation to get the expression result...
-            List<string> final_result = postfixeval(postfixlst);
-            //get final model values...
-            CalcModel final_model = output(final_result,input);
-            //transfer model to view...
-            return View(final_model);
-        }
         private string addcommas(string infixstr)
         {
             if (infixstr is not null)
@@ -149,7 +153,7 @@ namespace standcalcwaspnet.Controllers
             {
                 return 1;
             }
-            else if (pre == "+" || pre == "-")
+            else if (pre == " " || pre == "-")
             {
                 return 2;
             }
@@ -169,7 +173,7 @@ namespace standcalcwaspnet.Controllers
         private List<string> inftopof(string[] infixarr)
         {
             List<string> postfix = new List<string>();
-            var temp = 0;
+            //var temp = 0;
             for (var i = 0; i < infixarr.Length; i++)
             {
                 var el = infixarr[i];
@@ -247,7 +251,7 @@ namespace standcalcwaspnet.Controllers
                     }
                     else if (postfixlst.Count > 2)
                     {
-                        if (postfixlst[i] == "+")
+                        if (postfixlst[i] == " ")
                         {
                             postfixlst[i] = (float.Parse((postfixlst[i - 2])) + float.Parse((postfixlst[i - 1]))).ToString();
                             postfixlst.RemoveRange(i - 2, 2);
@@ -277,16 +281,33 @@ namespace standcalcwaspnet.Controllers
             }
             return postfixlst;
         }
-        private CalcModel output(List<string> final_result,CalcModel model)
+        private CalcModel output(string infix,List<string> final_result)
         {
-            ModelState.Clear();
-            model.result = final_result[0];
             string no_of_req = HttpContext.Session.GetString("userReqCnt");
             HttpContext.Session.SetString("userReqCnt", (Int32.Parse(no_of_req) + 1).ToString());
-            //model.user = HttpContext.Session.GetString("username") + "-->" + HttpContext.Session.GetString("userReqCnt");
-            model.user = HttpContext.Session.GetString("username");
-            model.userReqCount = HttpContext.Session.GetString("userReqCnt");
-            return model;
+            CalcModel final_model = new CalcModel()
+            {
+                result = final_result[0],
+                user = HttpContext.Session.GetString("username"),
+                userReqCount = HttpContext.Session.GetString("userReqCnt")
+            };
+            return final_model;
+        }
+        public JsonResult Evaluation(string infix)
+        {
+            //split operators and operands string...
+            string infixstr = addcommas(infix);
+            //create an array of operators and operands...
+            string[] infixarr = removecommas(infixstr);
+            //converts infix array to postfix array for easy evaluation...
+            List<string> postfixlst = inftopof(infixarr);
+            //postfix list evaluation to get the expression result...
+            List<string> final_result = postfixeval(postfixlst);
+            //get final model values...
+            CalcModel final_model = output(infix,final_result);
+            //transfer model to view...
+            return Json(final_model);
+
         }
         public IActionResult Privacy()
         {

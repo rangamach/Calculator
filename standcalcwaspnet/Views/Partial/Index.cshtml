@@ -1,5 +1,14 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿<script src="~/lib/jquery/jquery-3.6.3.js"></script>
+<input type="text" id="age"/>
+<button id="btn1">Click Me</button>
+<div id="greet"></div>
+<script>
+    $(document).ready(function(){
+        var tb = $("#age");
+        $("#btn1").click(function(){
+            $.get("/Partial/GreetName?Lname=mach&age="+tb.val(), function (data) {
+                $("#greet").html("Welcome "+ data.name);
+            });
+        });
+    });
+</script>

@@ -27,15 +27,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapControllerRoute(name: "Login",
     pattern: "{controller=Home}/{action=Login}/{id?}");
-app.MapControllerRoute(name: "Home",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-/*app.MapControllerRoute(name: "blog",
-                pattern: "blog/{*article}",
-                defaults: new { controller = "Blog", action = "Article" });
-app.MapControllerRoute(name: "default",
-               pattern: "{controller=Home}/{action=Index}/{id?}");*/
