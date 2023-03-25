@@ -7,25 +7,41 @@
         <table>
             <tr>
                 <td>
-                    <p>@ViewBag.Sorry</p>
+                    <p>@ViewBag.Msg</p>
                 </td>
             </tr>
             <tr>
-                <td><label>Username: </label></td>
                 <td>
-                    @Html.TextBoxFor(s=>s.user,new {@class = "login_inp" })
+                    <div class="login-btn">
+                        <label>Username: </label>
+                    </div>
+                </td>
+                <td>
+                    <div class="login-btn">
+                        @Html.TextBoxFor(s=>s.UserName,new {@class = "login_inp" })
+                    </div>
                 </td>
             </tr>
             <tr>
-                <td><label>Password: </label></td>
-                <td>
-                    @Html.TextBoxFor(s=>s.pass,new {@class = "login_inp" })
+                    <td>
+                    <div class="login-btn">
+                        <label>Password: </label>
+                    </div>
                 </td>
+                    <td>
+                    <div class="login-btn">
+                            @Html.TextBoxFor(s=>s.Password,new {@class = "login_inp" })
+                    </div>
+                    </td>
             </tr>
             <tr>
                 <td colspan="2" align="center">
-                    <div class="login-btn"><input class="login" type="submit" value="Login" /></div>
+                    <div class="login-btn"><input class="login" type="submit" name="submitBtn" value="Login" /></div>
                 </td>
+            </tr>
+            <tr>
+                <td><div class="login-btn">Not Registered?</div></td>
+                <td><input class="login" type="submit" name="submitBtn" value="Register" /></td>
             </tr>
         </table>
     </div>

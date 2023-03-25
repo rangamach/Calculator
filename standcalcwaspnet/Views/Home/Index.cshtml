@@ -4,13 +4,23 @@
 }
 <script src="~/lib/jquery/jquery-3.6.3.js"></script>
 <link href="~/css/site.css" rel="stylesheet"/>
+<style>
+    .calcbrowser {
+        background-color: darkred;
+        width: 225px;
+        height: 425px;
+        border-radius: 5px;
+    }
+</style>
 <h1 id="ttle">Calculator</h1>
 <br>
 <div class="calcbrowser">
     <table>
      <tr>
-            <td><div class="meta" id="session">@Html.DisplayFor(u=>u.user)</div></td>
-            <td><div class="meta" id="cnt">@Html.DisplayFor(s=>s.userReqCount)</div></td>
+            <td><div class="meta" id="uid">ID: @Html.DisplayFor(u=>u.UserID)</div></td>
+     </tr>
+     <tr>
+            <td><div class="meta" id="session">User: @Html.DisplayFor(u=>u.Username)</div></td>
      </tr>
     </table>
     <table id="buttons" align="center">
@@ -45,28 +55,55 @@
     </table>
         <div class="input">
             <table>
-            <tr><td><div class="x">-X-X-X-X-X-X-X-X-X-X-X-X-</div></td></tr>
+                <tr>
+                    <td>
+                        <div class="x">-X-X-X-X-X-X-X-X-X-X-X-X-</div>
+                    </td>
+                </tr>
                 <tr>
                     <td align="center">
                         <input type="text" class="textbox_inp" readonly ="readonly"/>
                     </td>
                 </tr>
-            <tr><td><div class="x">-X-X-X-X-X-X-X-X-X-X-X-X-</div></td></tr>
                 <tr>
-                    <td align="center"><div id="textbox_res">@Html.DisplayFor(s=>s.result)</div></td>
+                    <td>
+                        <div class="x">-X-X-X-X-X-X-X-X-X-X-X-X-</div>
+                    </td>
                 </tr>
+                <tr>
+                    <td align="center">
+                        <div id="textbox_res">@Html.DisplayFor(s=>s.Result)</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="x">-X-X-X-X-X-X-X-X-X-X-X-X-</div>
+                    </td>
+                </tr>
+                <tr>
+                @using (Html.BeginForm())
+                {
+                <td>
+                        <div class="btns"><input class="login" type="submit" name="Unregister" value="Unregister" onclick="return confirm('Are you sure you want to unregister?')" /></div>
+                        </td>
+                }
+                </tr>
+                
             </table>
         </div>
 </div>
-    <script>
+<script>
         x = $("button");
         y = $(".textbox_inp")[0];
         var decimal = false;
         //loop to add click event to the operators and operands buttons except equals button...
-        for (var i = 0; i < x.length; i++)
+            for (var i = 0; i < x.length; i++)
+            {
+                x[i].addEventListener("click", pressed);
+            }
+        function con()
         {
-            //alert('button events adding');
-            x[i].addEventListener("click", pressed);
+            return Confirm("Are you sure you want to unregister?");
         }
     //function that validates at runtime the given expression is valid or not...
     function pressed(event) {
@@ -124,10 +161,13 @@
     }
     $(document).ready(function () {
         $(".evaluation").click(function () {
-            $.get("/Home/Evaluation?infix=" + $(".textbox_inp").val(), function (data) {
+            var expression = $(".textbox_inp").val();
+            expression = expression.replace("+","%2B");
+            $.get("/Home/Evaluation?infix=" + expression, function (data) {
                 $("#session").html(data.user);
-                $("#cnt").html(data.userReqCount);
                 $("#textbox_res").html(data.result);
+                $("#uid").html(data.userid);
+                $(".textbox_inp").val(data.expression);
             });
         });
     });

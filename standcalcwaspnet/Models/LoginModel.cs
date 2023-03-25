@@ -1,8 +1,19 @@
-﻿namespace standcalcwaspnet.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace standcalcwaspnet.Models
 {
     public class LoginModel
     {
-        public string user { get; set; }
-        public string pass { get; set; }
+        [Key]
+        public int UserID { get; set; }
+        [Required]
+        public string UserName { get; set; }
+        [Required]
+        public string Password { get; set; }
+        [Required]
+        public DateTime UserCreationDate { get; set; }
+        [Required]
+        public string AuthType { get; set; }
+
     }
 }

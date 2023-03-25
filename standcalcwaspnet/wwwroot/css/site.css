@@ -22,14 +22,6 @@ input {
     border-radius: 10px;
     transition: all 0.3s;
 }
-
-.calcbrowser {
-    background-color: darkred;
-    width: 225px;
-    height: 325px;
-    border-radius: 5px;
-}
-
 .textbox_inp {
     background-color: darkolivegreen;
     color: black;
@@ -116,4 +108,9 @@ p{
 }
 .login-btn{
     padding-top: 10px;
+}
+.success
+{
+    color:lightgreen;
+    background-color:darkgreen;
 }

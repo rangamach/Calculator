@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Win32;
+using standcalcwaspnet.Data;
 using standcalcwaspnet.Models;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Text;
 using System.Security.Cryptography.X509Certificates;
 
 namespace standcalcwaspnet.Controllers
@@ -14,58 +19,127 @@ namespace standcalcwaspnet.Controllers
         {
             _logger = logger;
         }
+        CalcModel model = new CalcModel();
         [HttpGet]
-        public ActionResult Index(string Name)
+        public ActionResult Index()
         {
-            CalcModel model = new CalcModel();
-            HttpContext.Session.SetString("username", Name);
-            HttpContext.Session.SetString("userReqCnt", "0");
-            model.user = HttpContext.Session.GetString("username");
-            model.userReqCount = HttpContext.Session.GetString("userReqCnt");
+            model = populatemodel();
             return View(model);
+        }
+        [HttpPost]
+        public ActionResult Index(string unregister)
+        {
+            if(unregister == "Unregister")
+            {
+                ServerData delete = new ServerData();
+                int uid = Convert.ToInt32(HttpContext.Session.GetInt32("userid"));
+                bool result = delete.DeleteUser(uid);
+                if (result)
+                {
+                    HttpContext.Session.SetString("unreg", "Succesively Unregistered.");
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    return View();
+                }
+            }
+            else
+            {
+                model = populatemodel();
+                return View(model);
+            }
         }
         [HttpGet]
         public ActionResult Login()
         {
+            if (HttpContext.Session.GetString("unreg") == "Succesively Unregistered.")
+            {
+                ViewBag.Msg = "Succesively Unregistered.";
+            }
             return View();
         }
         [HttpPost]
-        public ActionResult Login(LoginModel input)
+        public ActionResult Login(LoginModel input,string submitBtn)
         {
-            List<LoginModel> Login_Info = new List<LoginModel>();
-            Login_Info.Add(new LoginModel
+            switch(submitBtn)
             {
-                user = "Ranga",
-                pass = "Mach"
-            });
-            Login_Info.Add(new LoginModel
+                case "Login":
+                    ServerData user_data = new ServerData();
+                    List<LoginModel> User_List = user_data.GetAllUsers();
+                    if (Validate_Login(input))
+                    {
+                        InitializeSession();
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        ViewBag.Msg = "Invalid User Name";
+                        return View();
+                    }
+                    bool Validate_Login(LoginModel input_info)
+                    {
+                        foreach (var user_info in User_List)
+                        {
+                            if (input_info.UserName == user_info.UserName && input_info.Password == user_info.Password)
+                            {
+                                input.UserID = user_info.UserID;
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                    void InitializeSession()
+                    {
+                        HttpContext.Session.SetString("username", input.UserName);
+                        HttpContext.Session.SetInt32("userid", input.UserID);
+                        HttpContext.Session.SetInt32("Usercount", -1);
+                        HttpContext.Session.SetString("sid", HttpContext.Session.Id.ToString());
+                        HttpContext.Session.SetString("infixexp", "");
+                        HttpContext.Session.SetString("res", "");
+                    }
+                case "Register":
+                    return RedirectToAction("Registration");
+                default:
+                    return View();
+            }
+        }
+        [HttpGet]
+        public ActionResult Registration()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Registration(LoginModel model,string submitbtn)
+        {
+            ServerData insert = new ServerData();
+            if(submitbtn == "Register")
             {
-                user = "Hemanth",
-                pass = "Venk"
-            });
-            if (Validate_Login(input))
+                HttpContext.Session.SetString("unreg", "");
+                model.UserCreationDate = DateTime.Now;
+                model.AuthType = "Custom";
+                bool result = insert.AddUser(model);
+                if (result)
+                {
+                    ViewBag.Success = "Successively Registered.";
+                }
+                else
+                {
+                    ViewBag.Success = "Unsuccessively Registered.";
+                }
+                return View();
+            }
+            else if(submitbtn == "Go Back")
             {
-                return RedirectToAction("Index", new { name = input.user });
+                return RedirectToAction("Login");
             }
             else
             {
-                ViewBag.Sorry = "Invalid User Name";
                 return View();
-            }
-            bool Validate_Login(LoginModel input)
-            {
-                foreach (var input_info in Login_Info)
-                {
-                    if (input.user == input_info.user && input.pass == input_info.pass)
-                    {
-                        return true;
-                    }
-                }
-                return false;
             }
         }
         //constant string of operators...
-        string operatorstr = " -*/^()";
+        string operatorstr = "+-*/^()";
         //List to keep track of operators...
         List<string> stacklst = new List<string>();
         int top_op = -1;
@@ -153,7 +227,7 @@ namespace standcalcwaspnet.Controllers
             {
                 return 1;
             }
-            else if (pre == " " || pre == "-")
+            else if (pre == "+" || pre == "-")
             {
                 return 2;
             }
@@ -251,7 +325,7 @@ namespace standcalcwaspnet.Controllers
                     }
                     else if (postfixlst.Count > 2)
                     {
-                        if (postfixlst[i] == " ")
+                        if (postfixlst[i] == "+")
                         {
                             postfixlst[i] = (float.Parse((postfixlst[i - 2])) + float.Parse((postfixlst[i - 1]))).ToString();
                             postfixlst.RemoveRange(i - 2, 2);
@@ -281,20 +355,29 @@ namespace standcalcwaspnet.Controllers
             }
             return postfixlst;
         }
-        private CalcModel output(string infix,List<string> final_result)
+        private CalcModel output()
+        { 
+            CalcModel model = populatemodel();
+            return model;
+        }
+        private CalcModel populatemodel()
         {
-            string no_of_req = HttpContext.Session.GetString("userReqCnt");
-            HttpContext.Session.SetString("userReqCnt", (Int32.Parse(no_of_req) + 1).ToString());
-            CalcModel final_model = new CalcModel()
-            {
-                result = final_result[0],
-                user = HttpContext.Session.GetString("username"),
-                userReqCount = HttpContext.Session.GetString("userReqCnt")
-            };
-            return final_model;
+            CalcModel model = new CalcModel();
+            model.Username = HttpContext.Session.GetString("username");
+            model.UserID = Convert.ToInt32(HttpContext.Session.GetInt32("userid"));
+            model.SessionID = HttpContext.Session.GetString("sid");
+            model.Expression = HttpContext.Session.GetString("infixexp");
+            model.Date = DateTime.Now;
+            model.Result = HttpContext.Session.GetString("res");
+            int ucnt = Convert.ToInt32(HttpContext.Session.GetInt32("Usercount"));  
+            HttpContext.Session.SetInt32("Usercount",ucnt + 1);
+            model.UserCount = Convert.ToInt32(HttpContext.Session.GetInt32("Usercount"));
+            HttpContext.Session.SetString("unreg", "");
+            return model;
         }
         public JsonResult Evaluation(string infix)
         {
+            HttpContext.Session.SetString("infixexp", infix);
             //split operators and operands string...
             string infixstr = addcommas(infix);
             //create an array of operators and operands...
@@ -303,12 +386,14 @@ namespace standcalcwaspnet.Controllers
             List<string> postfixlst = inftopof(infixarr);
             //postfix list evaluation to get the expression result...
             List<string> final_result = postfixeval(postfixlst);
+            HttpContext.Session.SetString("res", final_result[0]);
             //get final model values...
-            CalcModel final_model = output(infix,final_result);
+            model = populatemodel();
             //transfer model to view...
-            return Json(final_model);
+            return Json(model);
 
         }
+
         public IActionResult Privacy()
         {
             return View();
